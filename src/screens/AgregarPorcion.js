@@ -1,114 +1,116 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { Image } from 'expo-image';
+import React, { useState } from "react";
+import { Image } from "expo-image";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, ImageBackground } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AgregarPorcion = ({ navigation }) => {
-  const [horario, setHorario] = useState('20:00');
-  const [grams, setGrams] = useState('');
+  const [grams, setGrams] = useState("");
+  const [time, setTime] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
+
+  const onChange = (event, selectedDate) => {
+    setShowPicker(false);
+    if (selectedDate) setTime(selectedDate);
+  };
+
+
+const handleSchedule = async () => {
+  if (!grams || isNaN(grams) || grams <= 0) {
+    alert("Por favor, ingresa una cantidad válida en gramos.");
+    return;
+  }
+
+  const now = new Date();
+  const delay = time - now; 
+
+  if (delay < 0) {
+    alert("La hora seleccionada ya pasó. Elige una hora futura.");
+    return;
+  }
+
+  console.log("Programado para", time.toLocaleTimeString(), "con", grams, "gramos");
+
+  const email = await AsyncStorage.getItem("userEmail");
+  if (!email) {
+    alert("Error: No se encontró el email del usuario.");
+    return;
+  }
+
+  setTimeout(() => {
+    fetch("http://192.168.1.X/dispensar", { 
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, grams }),
+    })
+      .then(response => response.json())
+      .then(data => console.log("Respuesta ESP32:", data))
+      .catch(error => console.error("Error al enviar datos:", error));
+  }, delay);
+};
 
   return (
-    <ImageBackground source={require('../assets/Patron_boca.png')} style={styles.background}>
-      <View style={styles.overlay}>
-        <Text style={styles.title}>Programar Comida</Text>
+    <ImageBackground source={require("../assets/Patron_boca.png")} style={styles.background} imageStyle={{ opacity: 0.3 }}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.body}>
+          <Text style={styles.title}>Programa comida</Text>
+          <Image source={require("../assets/anima3.gif")} style={styles.gif} />
 
-        <Image source={require('../assets/anima3.gif')} style={styles.gif} />
+          <View style={styles.card}>
+            <Text style={styles.label}>Seleccionar horario</Text>
+            <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.inputContainer}>
+              <Text style={styles.inputText}>{time.toLocaleTimeString()}</Text>
+            </TouchableOpacity>
+            {showPicker && (
+              <DateTimePicker
+                value={time}
+                mode="time"
+                is24Hour={false}
+                display="spinner"
+                onChange={onChange}
+              />
+            )}
+          </View>
 
-        <Text style={styles.label}>Seleccionar horario</Text>
-        <Picker selectedValue={horario} style={styles.picker} onValueChange={(itemValue) => setHorario(itemValue)}>
-          <Picker.Item label="8:00 am" value="8:00" />
-          <Picker.Item label="9:00 am" value="9:00" />
-          <Picker.Item label="10:00 am" value="10:00" />
-          <Picker.Item label="11:00 am" value="11:00" />
-          <Picker.Item label="12:00 pm" value="12:00" />
-          <Picker.Item label="1:00 pm" value="1:00" />
-          <Picker.Item label="2:00 pm" value="2:00" />
-          <Picker.Item label="3:00 pm" value="3:00" />
-          <Picker.Item label="4:00 pm" value="4:00" />
-          <Picker.Item label="5:00 pm" value="5:00" />
-          <Picker.Item label="6:00 pm" value="6:00" />
-          <Picker.Item label="7:00 pm" value="7:00" />
-          <Picker.Item label="8:00 pm" value="8:00" />
-          <Picker.Item label="9:00 pm" value="9:00" />
-          <Picker.Item label="10:00 pm" value="10:00" />
-          <Picker.Item label="11:00 pm" value="11:00" />
-          <Picker.Item label="12:00 am" value="12:00" />
-        </Picker>
+          <View style={styles.card}>
+            <Text style={styles.label}>Gramos</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={grams}
+              onChangeText={setGrams}
+              placeholder="Ingresa la cantidad"
+              placeholderTextColor="#666"
+            />
+          </View>
 
-        <Text style={styles.label}>Cantidad (en gramos)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Ej: 50g"
-          value={grams}
-          onChangeText={setGrams}
-          keyboardType="numeric"
-        />
+          <TouchableOpacity style={styles.button} onPress={handleSchedule}>
+            <Text style={styles.buttonText}>Aceptar</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={styles.buttonText}>Guardar</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>Volver</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  overlay: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)', // Capa semitransparente para ver la imagen de fondo
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    marginBottom: 25,
-    textAlign: 'center',
-    color: '#2A7372',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#2A7372',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
-    marginBottom: 16,
-    backgroundColor: '#A8DCD9',
-    borderRadius: 5,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    backgroundColor: '#A8DCD9',
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    color: '#2A7372',
-  },
-  button: {
-    marginTop: 20,
-    padding: 15,
-    backgroundColor: '#57B5AC',
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  gif: {
-    width: 150,
-    height: 150,
-    alignSelf: 'center',
-    marginBottom: 30,
-  },
+  container: { flex: 1, backgroundColor: "transparent" },
+  background: { flex: 1, resizeMode: "cover" },
+  gif: { width: 150, height: 150, alignSelf: "center", marginTop: 20 },
+  body: { padding: 20, alignItems: "center" },
+  title: { fontSize: 26, fontWeight: "bold", marginVertical: 20, color: "#333" },
+  card: { backgroundColor: "rgb(160, 237, 230)", padding: 20, borderRadius: 15, width: "100%", marginVertical: 10 },
+  label: { fontSize: 18, marginBottom: 10, fontWeight: "600", color: "#333" },
+  inputContainer: { backgroundColor: "#fff", padding: 12, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  inputText: { fontSize: 16, color: "#333" },
+  input: { backgroundColor: "#fff", padding: 12, borderRadius: 10, fontSize: 16 },
+  button: { backgroundColor: "#B2FFFF", padding: 15, borderRadius: 25, marginTop: 20, alignItems: "center", width: "80%", shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 5, elevation: 3 },
+  buttonText: { fontSize: 18, fontWeight: "600", color: "#" },
+  backText: { marginTop: 20, color: "#007BFF", fontSize: 16, fontWeight: "600" }
 });
 
 export default AgregarPorcion;

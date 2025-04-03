@@ -1,42 +1,45 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 
-const detecciones = [
-  { id: '1', mensaje: 'Gato detectado a las 8:00 AM' },
-  { id: '2', mensaje: 'Gato detectado a las 12:00 PM' },
-];
-
-const ConsultarDetecciones = ({ navigation }) => {
-   return (
-    <View style={styles.container}>
-      <FlatList
-        data={detecciones}
-        keyExtractor={(item) => item.fecha}
-        renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text>Fecha: {item.fecha}</Text>
-            <Text>Sensor: {item.sensor}</Text>
-            {item.nivel && <Text>Nivel: {item.nivel}</Text>}
-          </View>
-        )}
-      />
-    </View>
+const ConsultarDetecciones = () => {
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Último registro del nivel de agua:</Text>
+      <Text style={styles.date}>27 de Enero de 2025 a las 18:19</Text>
+      <Text style={styles.status}>Estado: Bajo</Text>
+      
+      <Text style={styles.title}>Detección:</Text>
+      <Text style={styles.date}>27 de Enero de 2025 a las 18:19</Text>
+      
+      <Text style={styles.title}>Detección:</Text>
+      <Text style={styles.date}>27 de Enero de 2025 a las 15:36</Text>
+      
+      <Text style={styles.title}>Detección:</Text>
+      <Text style={styles.date}>27 de Enero de 2025 a las 13:54</Text>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
+    backgroundColor: "#fff",
+    padding: 20,
+    flexGrow: 1,
   },
-  item: {
-    padding: 16,
-    marginBottom: 8,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
+  title: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 15,
+  },
+  date: {
+    fontSize: 14,
+    color: "#333",
+  },
+  status: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "red",
   },
 });
-
 
 export default ConsultarDetecciones;

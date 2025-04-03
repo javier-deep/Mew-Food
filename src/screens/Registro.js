@@ -5,7 +5,7 @@ import * as Yup from "yup";
 
 const validationSchema = Yup.object().shape({
   nombre: Yup.string().required("El nombre es obligatorio"),
-  correo: Yup.string().email("Correo inválido").required("El correo es obligatorio"),
+  email: Yup.string().email("Correo inválido").required("El correo es obligatorio"),
   telefono: Yup.string()
     .matches(/^\d{10}$/, "El teléfono debe tener 10 dígitos")
     .required("El teléfono es obligatorio"),
@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
 const Registro = ({ navigation }) => {
   const handleRegister = async (values) => {
     try {
-      const response = await fetch("http://192.168.29.134:3000/register", {
+      const response = await fetch("http://192.168.1.103:3000/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
@@ -41,7 +41,7 @@ const Registro = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>Registro</Text>
         <Formik
-          initialValues={{ nombre: "", correo: "", telefono: "", password: "", confirmPassword: "" }}
+          initialValues={{ nombre: "", email: "", telefono: "", password: "", confirmPassword: "" }}
           validationSchema={validationSchema}
           onSubmit={handleRegister}
         >
@@ -59,12 +59,12 @@ const Registro = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Correo electrónico"
-                onChangeText={handleChange("correo")}
-                onBlur={handleBlur("correo")}
-                value={values.correo}
+                onChangeText={handleChange("email")}
+                onBlur={handleBlur("email")}
+                value={values.email}
                 keyboardType="email-address"
               />
-              {touched.correo && errors.correo && <Text style={styles.error}>{errors.correo}</Text>}
+              {touched.email && errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
               <TextInput
                 style={styles.input}
@@ -175,3 +175,4 @@ const styles = StyleSheet.create({
 });
 
 export default Registro;
+

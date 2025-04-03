@@ -2,13 +2,15 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons'; 
+import EditarPerfil from '../screens/HomeScreen';
 import ConsultarHorarios from '../screens/AgregarPorcion';
-import EditarPerfil from '../screens/InsertarFotoPerfil';
-import Notificaciones from '../screens/Notificaciones';
+//import EditarPerfil from '../screens/InsertarFotoPerfil';
+import Notificaciones from '../screens/ListaMascotas';
 import AgregarHorarios from '../screens/AgregarHorarios';
 import InsertarMascota from '../screens/InsertarMascota';
 import ConsultarDetecciones from '../screens/ConsultarDetecciones';
 import FastImage from 'react-native-fast-image';
+import HomeScreen from '../screens/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +23,7 @@ const TabNavigator = () => {
 
           if (route.name === 'ConsultarHorarios') {
             iconName = focused ? 'time' : 'time-outline';
-          } else if (route.name === 'EditarPerfil') {
+          } else if (route.name === 'HomeScreen') {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === 'Notificaciones') {
             iconName = focused ? 'notifications' : 'notifications-outline';
@@ -40,15 +42,16 @@ const TabNavigator = () => {
       })}
     >
       <Tab.Screen
+        name="HomeScreen"
+        component={HomeScreen}
+        options={{ title: 'Home' }}
+      />
+      <Tab.Screen
         name="ConsultarHorarios"
         component={ConsultarHorarios}
         options={{ title: 'Dispensar' }}
       />
-      <Tab.Screen
-        name="EditarPerfil"
-        component={EditarPerfil}
-        options={{ title: 'Perfil' }}
-      />
+      
       <Tab.Screen
         name="Notificaciones"
         component={Notificaciones}

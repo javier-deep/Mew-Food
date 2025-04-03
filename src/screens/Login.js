@@ -9,11 +9,25 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().min(6, "Mínimo 6 caracteres").required("La contraseña es obligatoria"),
 });
 
-const saveSession = async (token) => {
+const saveSession = async (usuario) => {
   try {
-    await AsyncStorage.setItem("userToken", token);
+    await AsyncStorage.setItem("Usuario", JSON.stringify(usuario)); 
+    await AsyncStorage.setItem("userEmail", usuario.email);  // Asegúrate de que el email se guarda aquí
+    await AsyncStorage.setItem("usuarioId", usuario._id); 
+    console.log("Usuario guardado en AsyncStorage:", usuario); // Log para verificar que se guarda correctamente
   } catch (error) {
-    console.log(error);
+    console.log("Error guardando sesión:", error);
+  }
+};
+
+const getEmailFromStorage = async () => {
+  try {
+    const email = await AsyncStorage.getItem("userEmail");
+    console.log("Email recuperado de AsyncStorage:", email);  // Verifica si el email está siendo recuperado correctamente
+    return email;
+  } catch (error) {
+    console.log("Error al obtener email de AsyncStorage:", error);
+    return null;
   }
 };
 
@@ -23,16 +37,27 @@ const Login = ({ navigation }) => {
   const handleLogin = async (values) => {
     setLoading(true);
     try {
-      const response = await fetch("http://192.168.29.134:3000/login", {
+      const response = await fetch("http://192.168.1.103:3000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ correo: values.email, password: values.password }),
+        body: JSON.stringify({ email: values.email, password: values.password }),
       });
+
       const data = await response.json();
+      
+      // Verifica la estructura de la respuesta
+      console.log("Respuesta de la API:", data);
+      
       if (response.ok) {
-        await saveSession(data.token);
-        Alert.alert("Éxito", "Inicio de sesión exitoso");
-        navigation.navigate("Main");
+        // Verifica si la propiedad 'email' está presente en la respuesta
+        if (data.usuario && data.usuario.email) {
+          await saveSession(data.usuario); // Almacena el usuario
+          console.log("Usuario después de iniciar sesión:", data.usuario);  // Verifica si se guarda correctamente
+          Alert.alert("Éxito", "Inicio de sesión exitoso");
+          navigation.navigate("Main");
+        } else {
+          Alert.alert("Error", "No se encontró el email en la respuesta");
+        }
       } else {
         Alert.alert("Error", data.error);
       }
@@ -91,6 +116,7 @@ const Login = ({ navigation }) => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -158,3 +184,4 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
+
