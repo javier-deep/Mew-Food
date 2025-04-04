@@ -34,7 +34,7 @@ const ListaMascotas = () => {
         // Intentar buscar por usuarioId
         if (storedUserId) {
           const response = await fetch(
-            `http://192.168.1.103:3000/mascotas/buscar?usuarioId=${storedUserId}`
+            `http://192.168.1.102:3000/mascotas/buscar?usuarioId=${storedUserId}`
           );
           if (response.ok) {
             const responseData = await response.json();
@@ -47,7 +47,7 @@ const ListaMascotas = () => {
         // Si no se encontraron mascotas con usuarioId, buscar por email
         if ((!data || data.length === 0) && storedEmail) {
           const response = await fetch(
-            `http://192.168.1.103:3000/mascotas/buscar?email=${storedEmail}`
+            `http://192.168.1.102:3000/mascotas/buscar?email=${storedEmail}`
           );
           if (response.ok) {
             const responseData = await response.json();
@@ -104,7 +104,7 @@ const ListaMascotas = () => {
   source={{
     uri: item.foto && item.foto.startsWith("http")
       ? item.foto
-      : `http://192.168.1.103:3000${item.foto}`,
+      : `http://192.168.1.102:3000${item.foto}`,
   }}
   style={styles.image}
 />
@@ -114,14 +114,7 @@ const ListaMascotas = () => {
                 <Text style={styles.info}>Raza: {item.raza || "No disponible"}</Text>
                 <Text style={styles.info}>Color: {item.color || "No disponible"}</Text>
                 <Text style={styles.info}>Peso: {item.peso || "No disponible"} kg</Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    Alert.alert("Editar datos", `Editar información de ${item.nombre}`)
-                  }
-                  style={styles.editButton}
-                >
-                  <Text style={styles.editButtonText}>Editar datos</Text>
-                </TouchableOpacity>
+               
               </View>
             </View>
           )}

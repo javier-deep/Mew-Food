@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
 const Registro = ({ navigation }) => {
   const handleRegister = async (values) => {
     try {
-      const response = await fetch("http://192.168.1.103:3000/register", {
+      const response = await fetch("http://192.168.1.102:3000/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
